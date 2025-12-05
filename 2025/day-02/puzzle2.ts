@@ -9,27 +9,25 @@ const inputFilePath = join(__dirname, "input.txt");
 function solve(filename: string): number {
   const content = readFileSync(filename, "utf-8");
   const lines = content.trim().split("\n");
-  const wrap = (n: number, max: number) => ((n % max) + max) % max;
 
-  let score = 0;
-  let pos = 50;
-
-  for (const line of lines) {
-    const direction = line[0];
-    const steps = parseInt(line.slice(1));
-
-    if (direction === "R") {
-      // Going right: count when we wrap from 99 → 0
-      score += Math.floor((pos + steps) / 100) - Math.floor(pos / 100);
-      pos = wrap(pos + steps, 100);
-    } else {
-      // Going left: count when we wrap from 1 → 0 (entering 0)
-      score += Math.ceil(pos / 100) - Math.ceil((pos - steps) / 100);
-      pos = wrap(pos - steps, 100);
+  const pairs = lines[0].split(",");
+  let ans = 0;
+  for (const pair of pairs) {
+    const [a, b] = pair.split("-").map(Number);
+    for (let i = a; i <= b; i++) {
+      const string = i.toString();
+      for (let j = 0; j < string.length; j++) {
+        if (string.length % j === 0) {
+          const segment = string.slice(0, j);
+          if (segment.repeat(string.length / j) === string) {
+            ans += i;
+            break;
+          }
+        }
+      }
     }
   }
-
-  return score;
+  return ans; 
 }
 
 console.log(`Test Solution: ${solve(testFilePath)}`);
